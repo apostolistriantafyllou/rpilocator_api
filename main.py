@@ -37,6 +37,12 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # init classes
 rpiloc = rpiLoc()
 
+@app.get("/pi4-8gb-stockcheck", tags=["pi4"])
+@limiter.limit("1/minute")
+def pi4-8gb-stockcheck():
+    """get all pi4-8gbs in stock"""
+    return rpiloc.pi4_8gig_stockcheck()
+
 
 @app.get("/pi4/{country}", tags=["pi4"])
 @limiter.limit("1/minute")
