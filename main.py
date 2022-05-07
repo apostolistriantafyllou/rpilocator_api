@@ -5,6 +5,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from starlette.requests import Request
+from ast import literal_eval
 
 from api.scrape import rpiLoc
 
@@ -37,11 +38,13 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # init classes
 rpiloc = rpiLoc()
 
-@app.get("/pi4-8gb-stockcheck", tags=["pi4"])
-@limiter.limit("1/minute")
-def pi4-8gb-stockcheck():
+@app.get("/pi4-stockcheck/{gbopts}", tags=["pi4"])
+def pi4_8gb_stockcheck(request: Request, gbopts):
     """get all pi4-8gbs in stock"""
-    return rpiloc.pi4_8gig_stockcheck()
+    #print(type(gbopts))
+    gblist = literal_eval(gbopts)
+    #print(gblist, gbopts)
+    return rpiloc.pi4_8gig_stockcheck(gblist)
 
 
 @app.get("/pi4/{country}", tags=["pi4"])
