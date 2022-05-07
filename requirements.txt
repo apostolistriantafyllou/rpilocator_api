@@ -8,3 +8,4 @@ slowapi==0.1.5
 tweepy==4.8.0
 starlette==0.17.1
 python-dotenv==0.20.0
+ast
