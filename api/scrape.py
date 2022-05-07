@@ -89,17 +89,18 @@ class rpiLoc:
                 raise Exception("API response: {}".format(status))
             return data
     @staticmethod
-    def pi4_8gig_stockcheck():
-        URL = f"https://rpilocator.com/?cat=PI4"
+    def pi4_8gig_stockcheck(gblist):
+        URL = f"https://rpilocator.com/"
         status = get_status(URL)
         response = get_soup(URL)
 
         # find table get th and td into rows
         tbody = response.find("tbody")
         containers = tbody.find_all("tr")
+        api = []
+        raspis = []
 
         if containers:
-            api = []
             for container in containers:
                 cells = container.find_all("td")
                 product = cells[0].text
@@ -107,28 +108,20 @@ class rpiLoc:
                 update_status = cells[2].find("i")["class"][2]
                 vendor = cells[3].text
                 in_stock = cells[4].text
-                price = "$" + cells[6].text[6:]
+                price = cells[6].text
 
-                if update_status == "text-success":
-                    if "8GB" in product:
-                        api.append(
-                            {
-                                "product": product,
-                                "url": url,
-                                "vendor": vendor,
-                                "in_stock": in_stock,
-                                "price": price,
-                            }
-
-                        )
+                if in_stock == 'Yes':
+                    if update_status == "text-success":
+                        for gb in gblist:
+                            #if str(gb)+"GB" in product:
+                            if str(gb)+"MB" in product:
+                                raspis.append([url, price])
             data = {"status": status, "data": api}
-
+            print(raspis)
             if status != 200:
                 raise Exception("API response: {}".format(status))
-            if api.in_stock == "Yes":
-                return api.url
-            else:
-                return 'false'
+            if str(raspis) != "[]":
+                return raspis
 
     @staticmethod
     def get_rss_entires(region: str):
